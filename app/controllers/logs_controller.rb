@@ -1,11 +1,9 @@
 class LogsController < ApplicationController
   before_action :authenticate, :verify_headers
-  
+
   def index
-    Rails.logger.info "Messages received: #{message_count}"
     log_records = []
     request.body.each_line do |line|
-      Rails.logger.info line
       log_records << line
     end
     send_to_aws_kinesis(log_records)
@@ -34,7 +32,7 @@ private
     client = Aws::Kinesis::Client.new(options)
     records = log_records.map do |log|
       {
-        data: log,
+        data: strip_logplex_headers(log),
         partition_key: "1"
       }
     end
@@ -43,6 +41,14 @@ private
       stream_name: ENV['AWS_KINESIS_STREAM_NAME']
     }
     client.put_records(params)
+  end
+
+  def strip_logplex_headers(log)
+    # Sample log data:
+    # 83 <40>1 2012-11-30T06:45:29+00:00 host app web.3 - State changed from starting to up
+    # Strip out everything before the log timestamp, which is after the 2nd space
+    second_space_pos = log.enum_for(:scan, / /).map { Regexp.last_match.begin(0) }[1] || 0
+    log[second_space_pos+1..-1]
   end
 
   def valid_content_type?
