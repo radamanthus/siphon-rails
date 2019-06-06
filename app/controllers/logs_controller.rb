@@ -28,7 +28,9 @@ private
   end
 
   def send_to_aws_kinesis(log_records)
-    options[:region] = ENV['AWS_KINESIS_REGION']
+    options = {
+      region: ENV['AWS_KINESIS_REGION']
+    }
     client = Aws::Kinesis::Client.new(options)
     records = log_records.map do |log|
       {
