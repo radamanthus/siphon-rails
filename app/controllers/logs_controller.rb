@@ -3,9 +3,12 @@ class LogsController < ApplicationController
   
   def index
     Rails.logger.info "Messages received: #{message_count}"
+    log_records = []
     request.body.each_line do |line|
       Rails.logger.info line
+      log_records << line
     end
+    send_to_aws_kinesis(log_records)
     head :ok
   end
 
@@ -22,6 +25,22 @@ private
 
   def message_count
     request.env['HTTP_LOGPLEX_MSG_COUNT']
+  end
+
+  def send_to_aws_kinesis(log_records)
+    options[:region] = ENV['AWS_KINESIS_REGION']
+    client = Aws::Kinesis::Client.new(options)
+    records = log_records.map do |log|
+      {
+        data: log,
+        partition_key: "1"
+      }
+    end
+    params = {
+      records: records,
+      stream_name: ENV['AWS_KINESIS_STREAM_NAME']
+    }
+    client.put_records(params)
   end
 
   def valid_content_type?
