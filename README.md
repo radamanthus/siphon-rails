@@ -1,24 +1,23 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+rails-siphon is a [Heroku Log Drain](https://devcenter.heroku.com/articles/log-drains) application that forwards the logs to a [AWS Kinesis Data Stream](https://aws.amazon.com/kinesis/data-streams).
 
-Things you may want to cover:
+## Deployment
 
-* Ruby version
+rails-siphon uses the following environment variables:
 
-* System dependencies
+| Variable name | Description |
+--- | ---
+| `AWS_ACCESS_ID` | access ID for your AWS IAM user|
+| `AWS_SECRET_ACCESS_KEY` | secret access key for your AWS IAM user |
+| `AWS_KINESIS_REGION` | AWS region where for the Kinesis stream |
+| `AWS_KINESIS_STREAM_NAME` | the AWS Kinesis stream name|
+| `LOGDRAIN_PASSWORD` | The Heroku log drain password |
+| `LOGDRAIN_USERNAME` | The Heroku log drain username |
+| `LOGPLEX_DRAIN_TOKEN` | The Heroku log drain token |
 
-* Configuration
+TODO:
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* Deploying to Heroku
+* AWS Setup
+* Setting up Heroku Log Drain
